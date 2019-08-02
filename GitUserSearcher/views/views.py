@@ -1,21 +1,50 @@
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
-
-# Create your views here.
-from django_filters import FilterSet
-from django_filters.rest_framework import DjangoFilterBackend
+from django.urls import reverse
+from django.utils import timezone
 from requests import Response
-from rest_framework.filters import OrderingFilter, SearchFilter
-from rest_framework import permissions, viewsets
-from rest_framework.utils import json
-from rest_framework.views import APIView
-
-from polls.integrations.api import make_request
-from polls.models import GitHubUser
+from rest_framework.decorators import api_view
 
 
-# Esta view va a buscar un usuario de github dependiendo del username que se le pase en la ruta
-# class Detail(APIView):
+from GitUserSearcher.models import User , SearchHistory
+from rest_framework import generics, status, request
+from GitUserSearcher.integrations.serializers import SearchHistorySerializer, UserSerializer
+from GitUserSearcher.integrations.api import make_request
 
 
+
+class SearchHistory(generics.ListAPIView):
+    queryset = SearchHistory.objects.filter(time=timezone.now())
+    serializer_class = SearchHistorySerializer
+
+
+class UserDetails(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+@api_view(['GET'])
+def user_detail(request, gitUsername, format=None):
+    try:
+        user = make_request(gitUsername)
+    except Exception:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
+
+# Testing make_request(username)
+@api_view(['GET'])
+def git_user(request, format=None):
+    data = make_request("fabrids23")
+    print(data["login"])
+    isHireable = True
+    if data["hireable"] is None:
+        isHireable = False
+    user = User(username=data["login"], numberOfSearchs=1, hireable=isHireable)
+    serializer = UserSerializer(user)
+    print(serializer.data)
+    return Response(serializer.data)
 

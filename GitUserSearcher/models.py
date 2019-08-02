@@ -12,4 +12,4 @@ class User(models.Model):
 class SearchHistory(models.Model):
     searcherUser = models.CharField(max_length=100)
     gitUser = models.ForeignKey(User, on_delete=models.CASCADE)
-    time = models.DateField
+    time = models.DateTimeField()
