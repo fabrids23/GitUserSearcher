@@ -6,7 +6,7 @@ from requests import Response
 from rest_framework.decorators import api_view
 
 
-from GitUserSearcher.models import User , SearchHistory
+from GitUserSearcher.models import GitUser , SearchHistory
 from rest_framework import generics, status, request
 from GitUserSearcher.integrations.serializers import SearchHistorySerializer, UserSerializer
 from GitUserSearcher.integrations.api import make_request
@@ -19,7 +19,7 @@ class SearchHistory(generics.ListAPIView):
 
 
 class UserDetails(generics.RetrieveAPIView):
-    queryset = User.objects.all()
+    queryset = GitUser.objects.all()
     serializer_class = UserSerializer
 
 
@@ -43,7 +43,7 @@ def git_user(request, format=None):
     isHireable = True
     if data["hireable"] is None:
         isHireable = False
-    user = User(username=data["login"], numberOfSearchs=1, hireable=isHireable)
+    user = GitUser(username=data["login"], numberOfSearchs=1, hireable=isHireable)
     serializer = UserSerializer(user)
     print(serializer.data)
     return Response(serializer.data)

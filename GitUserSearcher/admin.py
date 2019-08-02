@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import User, SearchHistory
+from .models import GitUser, SearchHistory
 
 
 class UserAdmin(admin.ModelAdmin):
     fields = ['username', 'numberOfSearchs', 'hireable']
 
 
-admin.site.register(User, UserAdmin)
+admin.site.register(GitUser, UserAdmin)

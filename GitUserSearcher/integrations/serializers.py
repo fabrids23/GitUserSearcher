@@ -1,5 +1,6 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
-from GitUserSearcher.models import User, SearchHistory
+from GitUserSearcher.models import GitUser, SearchHistory
 
 
 class SearchHistorySerializer(serializers.HyperlinkedModelSerializer):
@@ -13,5 +14,11 @@ class SearchHistorySerializer(serializers.HyperlinkedModelSerializer):
 class UserSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
-        model = User
+        model = GitUser
         fields = ['username', 'numberOfSearchs', 'hireable']
+
+
+class CurrentUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'password')
