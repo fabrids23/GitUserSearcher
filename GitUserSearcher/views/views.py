@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from rest_framework.decorators import api_view
 from django.views.generic import *
+from rest_framework.permissions import IsAuthenticated
+
 from GitUserSearcher.models import GitUser, SearchHistory
 from rest_framework import generics, viewsets
 from GitUserSearcher.integrations.serializers import SearchHistorySerializer, GitUserSerializer
@@ -15,6 +17,11 @@ class SearchHistoryList(generics.ListAPIView):
     for search in queryset:
         print(search)
     serializer_class = SearchHistorySerializer
+
+
+class SearchHireable(generics.ListAPIView):
+    queryset = GitUser.objects.filter(hireable=True)
+    serializer_class = GitUserSerializer
 
 
 class GitUserList(generics.ListAPIView):
