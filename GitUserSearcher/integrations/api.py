@@ -1,7 +1,7 @@
 import requests
 import json
 from rest_framework.renderers import JSONRenderer
-from GitUserSearcher.integrations.serializers import UserSerializer
+from GitUserSearcher.integrations.serializers import GitUserSerializer
 
 
 def make_request(username):
