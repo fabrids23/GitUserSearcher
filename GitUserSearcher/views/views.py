@@ -1,6 +1,5 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
-from requests import Response
 from rest_framework.decorators import api_view
 from GitUserSearcher.models import GitUser, SearchHistory
 from rest_framework import generics, viewsets
@@ -30,24 +29,27 @@ class GitUserDetail(viewsets.ReadOnlyModelViewSet):
     serializer_class = GitUserSerializer
     queryset = GitUser.objects.all()
 
-    def list(self, request):
-        queryset = GitUser.objects.all()
-        serializer = GitUserSerializer(queryset, many=True)
-        return Response(serializer.data)
 
-    def retrieve(self, request, pk=None):
-        queryset = GitUser.objects.all()
-        user = get_object_or_404(queryset, pk=pk)
-        serializer = GitUserSerializer(user)
-        return Response(serializer.data)
+@api_view(['GET'])
+def history_count(request, format=None):
+    all_git_user = GitUser.objects.all()
+    count = []
+    for git_user in all_git_user:
+        count.append(number_of_searchs_to_this_git_username(request, git_user))
+    result = []
+    for search in count:
+        if(search[1] != 0):
+            result.append(search)
+    return HttpResponse(result)
 
 
-# class GitUserDetail(View):
-
-    # def get(self, request, *args, **kwargs):
-    #     gitUser = get_object_or_404(GitUser, username=kwargs['gitUsername'])
-    #     context = {'gitUser': gitUser}
-    #     return render(request, 'GitUserSearch/userDetail.html', context)
+def number_of_searchs_to_this_git_username(request, gitUsername, format=None):
+    try:
+        queryset = SearchHistory.objects.filter(searcher_user=request.user, git_user=get_object_or_404(GitUser, username=gitUsername))
+        searchs = [gitUsername.__str__(), queryset.count()]
+        return searchs
+    except:
+         return HttpResponse("NO EXISTE")
 
 
 @api_view(['GET'])
@@ -72,30 +74,13 @@ def git_user(request, gitUsername, format=None):
         if search_history_instance.is_valid():
             search_history_instance.save()
         print(git_user_instance.data)
-        return Response(git_user_instance.data)
+        return JsonResponse(git_user_instance.data)
+        #todo quiere el id tambien en la respuesta?
     except Exception:
-        #print(str(Exception))
-        return userNotFound(request)
+         return userNotFound(request)
 
 
 def userNotFound(request):
     return HttpResponse("User not found")
-
-
-# Testing make_request(username)
-# @api_view(['GET'])
-# def git_user(request, format=None):
-#     data = make_request("fabrids23")
-#     print(data["login"])
-#     isHireable = True
-#     if data["hireable"] is None:
-#         isHireable = False
-#     user = User(username=data["login"], numberOfSearchs=1, hireable=isHireable)
-#     serializer = UserSerializer(user)
-#     print(serializer.data)
-#     return Response(serializer.data)
-#
-
-
 
 

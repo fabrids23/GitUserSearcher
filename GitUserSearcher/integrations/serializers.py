@@ -2,7 +2,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from rest_framework import serializers
 from GitUserSearcher.models import GitUser, SearchHistory
-from django.shortcuts import get_object_or_404
 
 
 class GitUserSerializer(serializers.ModelSerializer):
@@ -18,11 +17,8 @@ class GitUserSerializer(serializers.ModelSerializer):
         return GitUser.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        isHireable = True
-        if validated_data["hireable"] is None:
-            isHireable = False
         instance.username = validated_data.get('login', instance.username)
-        instance.hireable = isHireable
+        instance.hireable = validated_data.get('hireable', instance.hireable)
         instance.save()
         return instance
 
