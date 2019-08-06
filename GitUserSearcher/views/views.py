@@ -1,22 +1,19 @@
 from django.http import HttpResponse
-from django.shortcuts import render, redirect, get_object_or_404
-from django.utils import timezone
+from django.shortcuts import get_object_or_404
+from requests import Response
 from rest_framework.decorators import api_view
-from django.views.generic import *
-from rest_framework.permissions import IsAuthenticated
-
 from GitUserSearcher.models import GitUser, SearchHistory
 from rest_framework import generics, viewsets
-from GitUserSearcher.integrations.serializers import SearchHistorySerializer, GitUserSerializer
+from GitUserSearcher.integrations.serializers import SearchHistorySerializer, GitUserSerializer, SearchHistoryListViewSerialzier
 from GitUserSearcher.integrations.api import make_request
 
 
 class SearchHistoryList(generics.ListAPIView):
-    #todo filtrar que solo me muestre los que busco el usuario logeado, o que solo el admin pueda ver esto
-    queryset = SearchHistory.objects.all()
-    for search in queryset:
-        print(search)
-    serializer_class = SearchHistorySerializer
+    serializer_class = SearchHistoryListViewSerialzier
+
+    def get_queryset(self):
+        queryset = SearchHistory.objects.filter(searcher_user=self.request.user)
+        return queryset
 
 
 class SearchHireable(generics.ListAPIView):
@@ -33,15 +30,16 @@ class GitUserDetail(viewsets.ReadOnlyModelViewSet):
     serializer_class = GitUserSerializer
     queryset = GitUser.objects.all()
 
+    def list(self, request):
+        queryset = GitUser.objects.all()
+        serializer = GitUserSerializer(queryset, many=True)
+        return Response(serializer.data)
 
-    # def get_queryset(self):
-    #     serializer = GitUserSerializer
-    #     queryset = GitUser.objects.all()
-    #     lookup_url_kwarg = 'gitUsername'
-    #     return GitUser.objects.filter(username=self.kwargs.get('gitUsername'))
-    #
-    # def get_object(self):
-    #     return get_object_or_404(GitUser, username=self.kwargs.get('gitUsername'))
+    def retrieve(self, request, pk=None):
+        queryset = GitUser.objects.all()
+        user = get_object_or_404(queryset, pk=pk)
+        serializer = GitUserSerializer(user)
+        return Response(serializer.data)
 
 
 # class GitUserDetail(View):
@@ -68,19 +66,16 @@ def git_user(request, gitUsername, format=None):
         except GitUser.DoesNotExist:
             if git_user_instance.is_valid():
                 git_user_instance.save()
-        user = str(request.user)
-        searcher_user_data = {"username": user}
-        search_history_data = {"searcher_user": searcher_user_data, "git_user": git_user_data}
-        print(search_history_data)
+        id = GitUser.objects.get(username=data["login"]).id
+        search_history_data = {"searcher_user": request.user.id, "git_user": id}
         search_history_instance = SearchHistorySerializer(data=search_history_data)
         if search_history_instance.is_valid():
             search_history_instance.save()
-            #todo sacar estos redirects
-        return redirect('/search/users/' + data["login"], slug=data["login"])
+        print(git_user_instance.data)
+        return Response(git_user_instance.data)
     except Exception:
-         return redirect('/search/error/errorNotFound')
-    # serializer = GitUserSerializer(user)
-    #return redirect('userDetail', user.username)
+        #print(str(Exception))
+        return userNotFound(request)
 
 
 def userNotFound(request):

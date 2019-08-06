@@ -48,6 +48,16 @@ class CurrentUserWithoutPasswordSerializer(serializers.ModelSerializer):
 
 
 class SearchHistorySerializer(serializers.ModelSerializer):
+    git_user = serializers.PrimaryKeyRelatedField(queryset=GitUser.objects.all())
+    searcher_user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
+    class Meta:
+        model = SearchHistory
+        fields = ['searcher_user', 'git_user', 'time']
+
+
+class SearchHistoryListViewSerialzier(serializers.ModelSerializer):
+
     git_user = GitUserSerializer()
     searcher_user = CurrentUserWithoutPasswordSerializer()
 
@@ -55,11 +65,4 @@ class SearchHistorySerializer(serializers.ModelSerializer):
         model = SearchHistory
         fields = ['searcher_user', 'git_user', 'time']
 
-    def create(self, validated_data):
-        searcher_user_data = validated_data.get("searcher_user")
-        git_user_data = validated_data.get("git_user")
-        git_user = get_object_or_404(GitUser, username=git_user_data["username"])
-        searcher_user = get_object_or_404(User, username=searcher_user_data["username"])
-        search_history = SearchHistory(searcher_user=searcher_user, git_user=git_user)
-        search_history.save()
-        return search_history
+

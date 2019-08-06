@@ -20,4 +20,4 @@ class SearchHistory(models.Model):
     time = models.DateTimeField(default= timezone.now())
 
     def __str__(self):
-        return self.searcher_user + " searched " + self.gitUser.username
+        return self.searcher_user.username + " searched " + self.git_user.username

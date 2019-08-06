@@ -1,5 +1,4 @@
 from rest_framework_jwt import authentication
-
 from GitUserSearcher.integrations.serializers import CurrentUserSerializer
 from GitUserSearcher.utils import LogUtilMixin
 
