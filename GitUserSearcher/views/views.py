@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
@@ -11,7 +12,11 @@ class SearchHistoryList(generics.ListAPIView):
     serializer_class = SearchHistoryListViewSerialzier
 
     def get_queryset(self):
-        queryset = SearchHistory.objects.filter(searcher_user=self.request.user)
+        user = get_object_or_404(User, username=self.request.user)
+        if user.is_superuser:
+            queryset = SearchHistory.objects.all()
+        else:
+            queryset = SearchHistory.objects.filter(searcher_user=self.request.user)
         return queryset
 
 
