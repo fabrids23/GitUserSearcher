@@ -62,6 +62,7 @@ def git_user(request, gitUsername, format=None):
         git_user_data = {"username": data["login"], "hireable": isHireable}
         git_user_instance = GitUserSerializer(data=git_user_data)
         try:
+            #use get_object_or_404
             prevUser = GitUser.objects.get(username=data["login"])
             if git_user_instance.is_valid():
                 git_user_instance.update(prevUser, git_user_data)
@@ -73,14 +74,11 @@ def git_user(request, gitUsername, format=None):
         search_history_instance = SearchHistorySerializer(data=search_history_data)
         if search_history_instance.is_valid():
             search_history_instance.save()
-        print(git_user_instance.data)
         return JsonResponse(git_user_instance.data)
         #todo quiere el id tambien en la respuesta?
     except Exception:
-         return userNotFound(request)
+         return HttpResponse("User not found")
 
 
-def userNotFound(request):
-    return HttpResponse("User not found")
 
 

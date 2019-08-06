@@ -2,7 +2,6 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-
 from GitUserSearcher.views import views
 from GitUserSearcher.views.authviews import obtain_jwt_token
 
@@ -20,6 +19,5 @@ urlpatterns = [
     path('view/hireable/', views.SearchHireable.as_view(), name='hireable'),
     path('users/<int:pk>/', views.GitUserDetail.as_view({'get': 'retrieve'}), name="userDetail"),
     path('<str:gitUsername>/', views.git_user),
-    path('error/errorNotFound', views.userNotFound, name="errorNotFound"),
 ]
 
