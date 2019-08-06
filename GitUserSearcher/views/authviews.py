@@ -15,7 +15,6 @@ class MyObtainJSONWebToken(ObtainJSONWebToken, LogUtilMixin):
             response.status_code = status.HTTP_401_UNAUTHORIZED
 
         if response.status_code == status.HTTP_200_OK:
-            print(MyObtainJSONWebToken.__str__(self))
             response.data['user'] = CurrentUserSerializer(User.objects.get(username=request.data['username'])).data
         return response
 
