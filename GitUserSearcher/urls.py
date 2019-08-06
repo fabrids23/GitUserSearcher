@@ -17,7 +17,6 @@ urlpatterns = [
     path('view/countHistory', views.history_count),
     path('view/userList', views.GitUserList.as_view(), name="userList"),
     path('view/hireable/', views.SearchHireable.as_view(), name='hireable'),
-    path('users/<int:pk>/', views.GitUserDetail.as_view({'get': 'retrieve'}), name="userDetail"),
     path('<str:gitUsername>/', views.git_user),
 ]
 

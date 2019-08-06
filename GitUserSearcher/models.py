@@ -17,7 +17,7 @@ class GitUser(models.Model):
 class SearchHistory(models.Model):
     searcher_user = models.ForeignKey(User, on_delete=models.CASCADE)
     git_user = models.ForeignKey(GitUser, on_delete=models.CASCADE)
-    time = models.DateTimeField(default= timezone.now())
+    time = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.searcher_user.username + " searched " + self.git_user.username

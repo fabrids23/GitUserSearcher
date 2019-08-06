@@ -37,8 +37,9 @@ def history_count(request, format=None):
     for git_user in all_git_user:
         count.append(number_of_searchs_to_this_git_username(request, git_user))
     result = []
+    print(count)
     for search in count:
-        if(search[1] != 0):
+        if(search["count"] != 0):
             result.append(search)
     return HttpResponse(result)
 
@@ -46,8 +47,10 @@ def history_count(request, format=None):
 def number_of_searchs_to_this_git_username(request, gitUsername, format=None):
     try:
         queryset = SearchHistory.objects.filter(searcher_user=request.user, git_user=get_object_or_404(GitUser, username=gitUsername))
-        searchs = [gitUsername.__str__(), queryset.count()]
-        return searchs
+        search = {}
+        search['gitUsername'] = gitUsername.__str__()
+        search['count'] = queryset.count()
+        return search
     except:
          return HttpResponse("NO EXISTE")
 
