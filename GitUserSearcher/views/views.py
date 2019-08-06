@@ -48,29 +48,30 @@ class GitUserDetail(viewsets.ReadOnlyModelViewSet):
 @api_view(['GET'])
 def git_user(request, gitUsername, format=None):
     data = make_request(gitUsername)
-    #todo trabajar con excepciones??
     try:
         isHireable = True
         if data["hireable"] is None:
             isHireable = False
+        git_user_data = {"username": data["login"], "hireable": isHireable}
+        git_user_instance = GitUserSerializer(data=git_user_data)
         try:
-            # todo usar create y update en serializers
             prevUser = GitUser.objects.get(username=data["login"])
-            newNumberOfSearchs = prevUser.numberOfSearchs + 1
-            prevUser.hireable = isHireable
-            prevUser.numberOfSearchs = newNumberOfSearchs
-            user = prevUser
+            if git_user_instance.is_valid():
+                git_user_instance.update(prevUser, git_user_data)
         except GitUser.DoesNotExist:
-            user = GitUser(username=data["login"], numberOfSearchs=1, hireable=isHireable)
-        user.save()
-        instance = GitUserSerializer(data=data)
-        if instance.is_valid():
-            instance.save()
-        searchHistory = SearchHistory(searcherUser=request.user, gitUser=user, time=timezone.now())
-        searchHistory.save()
-        return redirect('/search/users/' + user.username, slug=user.username)
+            if git_user_instance.is_valid():
+                git_user_instance.save()
+        user = str(request.user)
+        searcher_user_data = {"username": user}
+        search_history_data = {"searcher_user": searcher_user_data, "git_user": git_user_data}
+        print(search_history_data)
+        search_history_instance = SearchHistorySerializer(data=search_history_data)
+        if search_history_instance.is_valid():
+            search_history_instance.save()
+            #todo sacar estos redirects
+        return redirect('/search/users/' + data["login"], slug=data["login"])
     except Exception:
-        return redirect('/search/error/errorNotFound')
+         return redirect('/search/error/errorNotFound')
     # serializer = GitUserSerializer(user)
     #return redirect('userDetail', user.username)
 
