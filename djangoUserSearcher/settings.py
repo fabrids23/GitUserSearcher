@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -40,6 +41,25 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'GitUserSearcher.authentication.GitUserSearcherJSONWebTokenAuthentication',
+    ],
+}
+
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(minutes=430),
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(minutes=430),
+    'JWT_AUTH_HEADER_PREFIX': 'Bearer',
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'GitUserSearcher.authentication.jwt_response_payload_handler',
+    'JWT_SECRET_KEY': 'jRR6H2J#p;xQcK39cf2SXJjZfBoVYyJCfpCWf)!6$H',
+    'JWT_ISSUER': 'GitUserSearcher'
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -78,7 +98,7 @@ WSGI_APPLICATION = 'djangoUserSearcher.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'searcher',
+        'NAME': 'git_searcher',
         'USER': 'root',
         'PASSWORD': 'password',
         'HOST': '127.0.0.1',
