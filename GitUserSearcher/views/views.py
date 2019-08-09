@@ -8,6 +8,7 @@ from rest_framework import generics, viewsets
 from GitUserSearcher.integrations.serializers import SearchHistorySerializer, GitUserSerializer, \
     SearchHistoryListViewSerializer
 from GitUserSearcher.integrations.api import make_request
+from django_filters import FilterSet
 
 
 class SearchHistoryList(generics.ListAPIView):
@@ -22,19 +23,17 @@ class SearchHistoryList(generics.ListAPIView):
         return queryset
 
 
-class SearchHireable(generics.ListAPIView):
-    queryset = GitUser.objects.filter(hireable=True)
-    serializer_class = GitUserSerializer
-
-
-class GitUserList(generics.ListAPIView):
-    queryset = GitUser.objects.all()
-    serializer_class = GitUserSerializer
+class GitUserFilter(FilterSet):
+    class Meta:
+        model = GitUser
+        fields = ('hireable', 'id')
 
 
 class GitUserDetail(viewsets.ReadOnlyModelViewSet):
     serializer_class = GitUserSerializer
     queryset = GitUser.objects.all()
+    search_fields = ('hireable', 'id')
+    filter_class = GitUserFilter
 
 
 @api_view(['GET'])
