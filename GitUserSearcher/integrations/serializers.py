@@ -32,7 +32,7 @@ class CurrentUserSerializer(serializers.ModelSerializer):
 class CurrentUserWithoutPasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username',]
+        fields = ['username', ]
         extra_kwargs = {
             'username': {
                 'validators': [UnicodeUsernameValidator()],
@@ -52,13 +52,10 @@ class SearchHistorySerializer(serializers.ModelSerializer):
         fields = ['searcher_user', 'git_user', 'time']
 
 
-class SearchHistoryListViewSerialzier(serializers.ModelSerializer):
-
+class SearchHistoryListViewSerializer(serializers.ModelSerializer):
     git_user = GitUserSerializer()
     searcher_user = CurrentUserWithoutPasswordSerializer()
 
     class Meta:
         model = SearchHistory
         fields = ['searcher_user', 'git_user', 'time']
-
-

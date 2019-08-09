@@ -21,3 +21,5 @@ class SearchHistory(models.Model):
 
     def __str__(self):
         return self.searcher_user.username + " searched " + self.git_user.username
+
+

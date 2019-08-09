@@ -1,9 +1,11 @@
 from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers
+from rest_framework import routers, permissions
 from GitUserSearcher.views import views
 from GitUserSearcher.views.authviews import obtain_jwt_token
+from rest_framework.documentation import include_docs_urls
+
 
 app_name = "GitUserSearch"
 router = routers.DefaultRouter()
@@ -18,5 +20,6 @@ urlpatterns = [
     path('view/userList', views.GitUserList.as_view(), name="userList"),
     path('view/hireable/', views.SearchHireable.as_view(), name='hireable'),
     path('<str:gitUsername>/', views.git_user),
+
 ]
 
