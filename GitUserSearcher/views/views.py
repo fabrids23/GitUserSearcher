@@ -9,6 +9,8 @@ from GitUserSearcher.integrations.serializers import SearchHistorySerializer, Gi
     SearchHistoryListViewSerializer
 from GitUserSearcher.integrations.api import make_request
 from django_filters import FilterSet
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class SearchHistoryList(generics.ListAPIView):
@@ -26,14 +28,16 @@ class SearchHistoryList(generics.ListAPIView):
 class GitUserFilter(FilterSet):
     class Meta:
         model = GitUser
-        fields = ('hireable', 'id')
+        fields = ('hireable', 'username', 'id',)
 
 
-class GitUserDetail(viewsets.ReadOnlyModelViewSet):
+class GitUserView(viewsets.ReadOnlyModelViewSet):
     serializer_class = GitUserSerializer
     queryset = GitUser.objects.all()
-    search_fields = ('hireable', 'id')
+    search_fields = ('hireable', 'username', 'id',)
     filter_class = GitUserFilter
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
+    ordering_fields = ['username', 'hireable']
 
 
 @api_view(['GET'])
