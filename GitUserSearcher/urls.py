@@ -8,7 +8,7 @@ from GitUserSearcher.views.authviews import obtain_jwt_token
 
 app_name = "GitUserSearch"
 router = routers.DefaultRouter()
-router.register(r'users', views.GitUserDetail)
+router.register(r'users', views.GitUserView)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
@@ -17,6 +17,5 @@ urlpatterns = [
     path('view/history', views.SearchHistoryList.as_view(), name="searchHistory"),
     path('view/countHistory', views.history_count),
     path('<str:gitUsername>/', views.git_user),
-
 ]
 
