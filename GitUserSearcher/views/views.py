@@ -39,10 +39,10 @@ class GitUserDetail(viewsets.ReadOnlyModelViewSet):
 @api_view(['GET'])
 def history_count(request):
     if request.user.is_superuser:
-        searchs_by_this_user = SearchHistory.objects.all().values('searcher_user', 'git_user').annotate(count=Count('git_user'))
+        searchs_by_this_user = SearchHistory.objects.all().values('searcher_user', 'searcher_user__username', 'git_user', 'git_user__username').annotate(count=Count('git_user'))
         return Response(searchs_by_this_user)
     else:
-        searchs_by_this_user = SearchHistory.objects.filter(searcher_user=request.user).values('git_user').annotate(count=Count('git_user'))
+        searchs_by_this_user = SearchHistory.objects.filter(searcher_user=request.user).values('git_user', 'git_user__username').annotate(count=Count('git_user'))
         return Response(searchs_by_this_user)
 
 
